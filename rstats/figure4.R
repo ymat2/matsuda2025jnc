@@ -3,8 +3,7 @@ library(tidyverse)
 library(phytools)
 library(ggtree)
 library(OptM)
-
-source("./rstats/plotting_func2.R")
+library(myrrr)
 
 
 ## NJtree
@@ -57,7 +56,7 @@ prefix = stringr::str_c(folder, "treemix", sep  ="/")
 
 ## Decide optimal M using OptM -------------------------------------------------
 
-test.optM = optM(folder, method = "Evanno")
+test.optM = OptM::optM(folder, method = "Evanno")
 
 deltaM = ggplot(test.optM) +
   aes(x = m, y = Deltam) +
@@ -76,7 +75,7 @@ deltaM
 
 opt_M = 5
 stem = paste0(prefix, ".1.", opt_M)
-tmobj = read_treemix(stem = stem) |> prep.layout()
+tmobj = myrrr::read_treemix(stem = stem)
 
 new_pop = c("Japan2 (Gamecocks)", "Shandong", "Shanxi", "Gamecock (China)", 
             "Yunnan", "Gamecock (Thailand, Vietnam)", "Vietnam", "Guangxi", "Jiangsu", "RJF",
@@ -84,7 +83,7 @@ new_pop = c("Japan2 (Gamecocks)", "Shandong", "Shanxi", "Gamecock (China)",
             "Beijing", "Thailand", "Japan3 (Others)")
 tmobj$layout$tips$pop = new_pop
 
-ptm = plot_treemix(tmobj) +
+ptm = myrrr::plot_treemix(tmobj) +
   scale_x_continuous(expand = expansion(mult = c(.05, .2))) +
   theme_treemix(base_size = 14) +
   theme(
@@ -99,4 +98,3 @@ p1 = cowplot::plot_grid(pnj, deltaM, nrow = 2, rel_heights = c(2, 1),
 p = cowplot::plot_grid(p1, ptm, ncol = 2, rel_widths = c(2, 3), 
                        labels = c("", "c"), label_size = 20)
 ggsave("images/treemix_result.tif", p, h = 9, w = 9, bg = "#FFFFFF")
-

@@ -30,6 +30,7 @@ In this repository you find codes used in Matsuda *et al.* (2025) Population gen
 - phytools
 - ggtree
 - OptM
+- [myrrr](https://github.com/ymat2/myrrr)
 
 
 ## Publication
