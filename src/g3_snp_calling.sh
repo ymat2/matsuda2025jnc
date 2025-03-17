@@ -1,11 +1,9 @@
-#$ -S /bin/bash
-#$ -cwd
-#$ -t 1-89
-#$ -l medium
-#$ -l s_vmem=64G
-#$ -l mem_req=64G
-#$ -o /dev/null
-#$ -e /dev/null
+#!/bin/bash
+
+#SBATCH -a 1-90
+#SBATCH --mem 64G
+#SBATCH -o /dev/null
+#SBATCH -e /dev/null
 
 
 samples=($(ls bam | sort -V))

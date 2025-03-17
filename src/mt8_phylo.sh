@@ -1,11 +1,7 @@
-#$ -S /bin/bash
-#$ -cwd
-#$ -l medium
-#$ -l mem_req=512G
-#$ -l s_vmem=512G
-#$ -o /dev/null
-#$ -e /dev/null
+#!/bin/bash
 
+#SBATCH -o /dev/null
+#SBATCH -e /dev/null
 
 shopt -s expand_aliases
 alias rapidnj="apptainer exec /usr/local/biotools/r/rapidnj:2.3.2--h4ac6f70_4 rapidnj"

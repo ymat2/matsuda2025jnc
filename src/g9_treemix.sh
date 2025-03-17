@@ -1,8 +1,7 @@
-#$ -S /bin/bash
-#$ -cwd
-#$ -o /dev/null
-#$ -e /dev/null
+#!/bin/bash
 
+#SBATCH -o /dev/null
+#SBATCH -e /dev/null
 
 shopt -s expand_aliases
 alias plink1="apptainer exec /usr/local/biotools/p/plink:1.90b4--0 plink"

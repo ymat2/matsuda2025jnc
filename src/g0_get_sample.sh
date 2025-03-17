@@ -1,8 +1,8 @@
-#$ -S /bin/bash
-#$ -cwd
-#$ -t 1-90
-#$ -o /dev/null
-#$ -e /dev/null
+#!/bin/bash
+
+#SBATCH -a 1-90
+#SBATCH -o /dev/null
+#SBATCH -e /dev/null
 
 sras=($(awk -F '\t' 'NR>1 {print $1}' data/sra_accession.tsv))
 sra=${sras[$SGE_TASK_ID-1]}

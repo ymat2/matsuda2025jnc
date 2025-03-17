@@ -1,10 +1,9 @@
-#$ -S /bin/bash
-#$ -cwd
-#$ -t 1-90
-#$ -l s_vmem=16G
-#$ -l mem_req=16G
-#$ -o /dev/null
-#$ -e /dev/null
+#!/bin/bash
+
+#SBATCH -a 1-90
+#SBATCH --mem 16G
+#SBATCH -o /dev/null
+#SBATCH -e /dev/null
 
 samples=($(awk -F '\t' 'NR>1 {print $1}' data/sra_accession.tsv))
 sample=${samples[$SGE_TASK_ID-1]}

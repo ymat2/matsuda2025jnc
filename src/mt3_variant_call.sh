@@ -1,9 +1,8 @@
-#$ -S /bin/bash
-#$ -cwd
-#$ -l s_vmem=32G
-#$ -l mem_req=32G
-#$ -o /dev/null
-#$ -e /dev/null
+#!/bin/bash
+
+#SBATCH --mem 32G
+#SBATCH -o /dev/null
+#SBATCH -e /dev/null
 
 
 samples=($(ls bam | sort -V))

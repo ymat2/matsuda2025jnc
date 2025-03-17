@@ -1,7 +1,7 @@
-#$ -S /bin/bash
-#$ -cwd
-#$ -o /dev/null
-#$ -e /dev/null
+#!/bin/bash
+
+#SBATCH -o /dev/null
+#SBATCH -e /dev/null
 
 shopt -s expand_aliases
 alias bcftools="apptainer exec /usr/local/biotools/b/bcftools:1.18--h8b25389_0 bcftools"
