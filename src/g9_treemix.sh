@@ -18,15 +18,9 @@ prefix=popstr.sub
 [ ! -e ${workdir} ] && mkdir -p ${workdir}
 cd ${workdir}
 
+## Make .clust file in local (`make_treemix_clust.R`)
 
-## Make .clust file
-
-cat ../data/sra_accession.tsv | awk 'NR>1 {print $1 "\t" $1 "\t" $2}' > popstr.clust
-bcftools query -l ${vcf} | grep -E 'YKD|SM' | awk '{print $1 "\t" $1 "\tShamo"}' >> popstr.clust
-bcftools query -l ${vcf} | grep -v -E 'YKD|SM|RR'  | awk '{print $1 "\t" $1 "\tJapan"}' >> popstr.clust
-# Need to be edited
-
-awk '{print $3}' popstr.clust | sort | uniq > treemix.list
+awk '{print $3}' treemix.clust | sort | uniq > treemix.list
 
 ## Make Treemix input file
 
@@ -45,7 +39,6 @@ plink1 --bfile ${bfile} \
 /usr/bin/python3 ../src/plink2treemix.py -i ${prefix}.frq.strat -o ${prefix}.treemix.frq
 rm ${prefix}.*miss ${prefix}.frq.strat ${prefix}.nosex
 gzip ${prefix}.treemix.frq
-
 
 for m in {1..8}; do
   for i in {1..5}; do

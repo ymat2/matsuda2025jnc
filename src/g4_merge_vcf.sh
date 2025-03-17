@@ -12,6 +12,7 @@ poppy summary -i bam -o out/vcf_summary.tsv --type vcf
 
 samples_sea=($(ls ~/popstr/bam | sort -V))  # Samples of South-east Asia
 samples_jnc=($(ls ~/jpool/bam | sort -V))   # Samples of Japan
+samples_abrc=($(ls ~/ABRC/bam | sort -V))   # Samples of ABRC
 
 rm out/use_samples.txt
 for s in ${samples_sea[@]}; do echo ~/popstr/bam/$s/$s.q.vcf.gz >> out/use_samples.txt; done
