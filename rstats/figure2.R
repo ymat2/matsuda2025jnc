@@ -4,62 +4,36 @@ library(phytools)
 library(ggtree)
 library(patchwork)
 
+source("./rstats/common_settings.R")
 
-accession2name = readr::read_tsv("data/sra_accession.tsv") |>
-  dplyr::select(Run, sample_id, country) |>
-  dplyr::rename(label = Run)
 
-jpool_names = readxl::read_excel(path = "data/Japanese_Chicken_DNAseq.xlsx", sheet = "Sheet1") |>
-  dplyr::select(sample, sample_name)
-
-### NJ -----
+### NJtree of mitchondrial whole genome -----
 
 nj = ape::read.tree("out/phylo/popstr.mt.nj.tree")
-tip2sym = data.frame(label = stringr::str_split(nj$tip.label, "/", simplify = TRUE)[,2]) |>
-  dplyr::left_join(accession2name, by = "label") |>
-  dplyr::left_join(jpool_names, by = dplyr::join_by(label == sample)) |>
-  dplyr::mutate(
-    sample_id = dplyr::if_else(is.na(sample_name), sample_id, sample_name),
-    country = dplyr::if_else(is.na(country), "Japan", country)
-)
+tip2sym = dplyr::tibble(label = stringr::str_split(nj$tip.label, "/", simplify = TRUE)[,2]) |>
+  dplyr::left_join(sample2group, by = dplyr::join_by(label == Run))
 nj$tip.label = tip2sym$sample_id
 
 njtr = ggtree(nj, layout = "circular", branch.length = "none", linewidth = .5) + 
-  geom_tiplab(size = 1.5, offset = .2)
-
-### ML -----
-
-ml = ape::read.tree("out/phylo/popstr.mt.treefile")
-tip2sym = data.frame(label = stringr::str_split(ml$tip.label, "/", simplify = TRUE)[,2]) |>
-  dplyr::left_join(accession2name, by = "label") |>
-  dplyr::left_join(jpool_names, by = dplyr::join_by(label == sample)) |>
-  dplyr::mutate(
-    sample_id = dplyr::if_else(is.na(sample_name), sample_id, sample_name),
-    country = dplyr::if_else(is.na(country), "Japan", country)
-  )
-ml$tip.label = tip2sym$sample_id
-
-mltr = ggtree(ml, layout = "circular", branch.length = "none", linewidth = .5) + 
   geom_tiplab(size = 1.5, offset = .2)
 
 ### Haplogroup classification by MitoToolPy -----
 
 mitotool = readr::read_tsv("out/phylo/popstr.mt.mitotool", skip = 4, comment = "---") |>
   dplyr::mutate(label = stringr::str_split(Sample_Name, "/", simplify = TRUE)[,2]) |>
-  dplyr::left_join(accession2name, by = "label") |>
-  dplyr::left_join(jpool_names, by = dplyr::join_by(label == sample)) |>
-  dplyr::mutate(sample_id = dplyr::if_else(is.na(sample_id), sample_name, sample_id)) |>
+  dplyr::left_join(sample2group, by = dplyr::join_by(label == Run)) |>
   dplyr::rename("Haplogroup (MitoToolPy)" = Haplogroup) |>
   dplyr::select(sample_id, `Haplogroup (MitoToolPy)`) |>
   tibble::column_to_rownames(var = "sample_id")
 
-df_country = tip2sym |>
-  dplyr::select(sample_id, country) |>
-  tibble::column_to_rownames(var = "sample_id")
+df_group = tip2sym |>
+  dplyr::select(sample_id, group) |>
+  tibble::column_to_rownames(var = "sample_id") |>
+  dplyr::mutate(group = forcats::fct_relevel(group, names(color_scale)))
 
 df_check = mitotool |> 
   tibble::rownames_to_column(var = "sample_id") |> 
-  dplyr::left_join(accession2name, by = "sample_id")
+  dplyr::left_join(sample2group, by = "sample_id")
   
 
 pnj = gheatmap(njtr, data = mitotool, offset = 8, width = .1, colnames = FALSE) +
@@ -68,25 +42,16 @@ pnj = gheatmap(njtr, data = mitotool, offset = 8, width = .1, colnames = FALSE) 
   guides(fill = guide_legend(ncol = 2))
 
 pnj = pnj + ggnewscale::new_scale_fill()
-pnj2 = gheatmap(pnj, data = df_country, offset = 6, width = .1, colnames = FALSE) +
-  scale_fill_discrete(type = palette.colors(palette = "Okabe-Ito")[-1]) +
-  labs(fill = "Country") +
+pnj2 = gheatmap(pnj, data = df_group, offset = 6, width = .1, colnames = FALSE) +
+  scale_fill_manual(values = color_scale) +
+  labs(fill = "Group") +
   guides(fill = guide_legend(ncol = 2))
-
-pml = gheatmap(mltr, data = mitotool, offset = 8, width = .1, colnames = FALSE) +
-  scale_fill_viridis_d(option = "H") +
-  labs(fill = "Haplogroup (MitoToolPy)")
-
-p = pnj + theme(legend.position = "none") + pml +
-  patchwork::plot_annotation(tag_levels = "a") &
-  theme(plot.tag = element_text(size = 24))
-
-ggsave(file = "images/haplogroups_by_mitotool.png", p, w = 13.5, h = 6)
+pnj2
 
 
-### MLtree for Japanese breeds -----
+### NJtree for Japanese breeds -----
 
-jpool_tips = tip2sym |> dplyr::filter(country == "Japan")
+jpool_tips = tip2sym |> dplyr::filter(group == "Japan")
 njjp = nj |> ape::keep.tip(jpool_tips$sample_id)
 
 ### Use aplot
@@ -125,6 +90,10 @@ pp = haplo_dot |> aplot::insert_top(pnjjp, height = .3) |> aplot::as.patchwork()
 
 ### arrange plots -----
 
-p = cowplot::plot_grid(pnj2, pp, nrow = 2, labels = c("a", "b"), rel_heights = c(3, 2), label_size = 20)
-ggsave(file = "images/mitochondria_haplogroup.tif", p, w = 9, h = 9, bg = "#FFFFFF")
+p = cowplot::plot_grid(
+  pnj2, pp, 
+  nrow = 2, labels = c("a", "b"), rel_heights = c(2, 1), 
+  label_size = LABELSIZE)
+p
+ggsave(file = "images/mitochondria_haplogroup_revise.jpg", p, w = 10, h = 10, bg = "#FFFFFF")
 

@@ -2,18 +2,14 @@ library(conflicted)
 library(tidyverse)
 library(cowplot)
 
-
-## Const -----
-
-LABELSIZE = 24
-BASESIZE = 16
+source("./rstats/common_settings.R")
 
 
 ## Photos -----
 
 ong = cowplot::ggdraw() +
   cowplot::draw_image("photos/ONG.jpg", scale = .95) +
-  ggtitle("Onaga-dori\n(ONG)") +
+  ggtitle("Onagadori\n(ONG)") +
   theme_test(base_size = BASESIZE) +
   theme(
     plot.title = element_text(hjust = .5, margin = margin(0,0,-5,0)), 
@@ -49,7 +45,7 @@ tot = cowplot::ggdraw() +
 
 osm = cowplot::ggdraw() +
   cowplot::draw_image("photos/OSM.jpg", scale = .95) +
-  ggtitle("Ohshamo\n(OSM)") +
+  ggtitle("Oshamo\n(OSM)") +
   theme_test(base_size = BASESIZE) +
   theme(
     plot.title = element_text(hjust = .5, margin = margin(0,0,-5,0)), 
@@ -84,18 +80,16 @@ world_map = ggplot2::map_data("world") |> dplyr::as_tibble()
 file_path = "data/Japanese_Chicken_DNAseq.xlsx"
 sheet = "Sheet1"
 sample_info = readxl::read_excel(path = file_path, sheet = sheet) |>
-  dplyr::filter(poolseq > 1) |>  # decide whether or not to include later
-  dplyr::select(sample, sample_name, common_name, poolseq, sampling_location, long, lat) |>
-  dplyr::mutate(description = dplyr::case_when(
-    stringr::str_detect(sample, "SM") ~ "Gamecocks",
-    sample_name %in% c("AKN", "WLH", "WKN", "WPR", "RIR", "UKK") ~ "Commercial line",
-    .default = "Native breeds"
-  ))
+  dplyr::filter(poolseq > 1) |>
+  dplyr::select(sample, sample_name, common_name, poolseq, sampling_location, long, lat)
 
-jmap = ggplot() + 
+jmap = sample_info |>
+  dplyr::filter(long != "NA") |>
+  dplyr::mutate(long = as.numeric(long), lat = as.numeric(lat)) |>
+  ggplot() + 
   aes(long, lat) +
   geom_map(data = world_map, aes(map_id = region), map = world_map, fill = "#bbbbbb", linewidth = 0) +
-  geom_point(data = sample_info, aes(color = description, shape = description), size = 2.5, position = "jitter") +
+  geom_point(size = 3, position = "jitter", shape = 21, color = "#333333", fill = "#FFFFFF") +
   scale_x_continuous(limits = c(125, 150), labels = scales::label_number(suffix = "°E")) +
   scale_y_continuous(limits = c(25, 50), labels = scales::label_number(suffix = "°N")) +
   scale_color_brewer(palette = "Set1") +
@@ -110,7 +104,9 @@ jmap = ggplot() +
     legend.background = element_blank()
   )
 
-snp_count = readr::read_tsv("../jpool/out/snp_count.txt") |>
+jpool_snp_count = readr::read_tsv("../jpool/out/snp_count.txt") 
+abrc_snp_count = readr::read_tsv("../ABRC/out/snp_count.txt") 
+snp_count = dplyr::bind_rows(jpool_snp_count, abrc_snp_count) |>
   dplyr::left_join(sample_info, by = "sample") |>
   tidyr::pivot_longer(dplyr::starts_with("n_"), names_to = "type", values_to = "count") |>
   tidyr::drop_na() |>
@@ -144,4 +140,5 @@ p2 = cowplot::plot_grid(jmap, NULL, snp_count, ncol = 3, rel_widths = c(1.4, .05
                         labels = c("b", "c", ""), label_size = LABELSIZE, align = "h", axis = "tb")
 
 p = cowplot::plot_grid(p1, p2, nrow = 2, rel_heights = c(1, 2), labels = c("a", ""), label_size = LABELSIZE)
-ggsave(file = "images/sample_information.tif", p, h = 8, w = 12, bg = "#FFFFFF")
+ggsave(file = "images/sample_information_revise.jpg", p, h = 8, w = 12, bg = "#FFFFFF")
+
