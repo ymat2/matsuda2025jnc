@@ -35,4 +35,4 @@ In this repository you find codes used in Matsuda *et al.* (2025) Population gen
 
 ## Publication
 
-*submitted*
+*in press*
