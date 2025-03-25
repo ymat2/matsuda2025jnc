@@ -1,6 +1,7 @@
 # Codes for Matsuda *et al.* 2025
 
-In this repository you find codes used in Matsuda *et al.* (2025) Population genomics elucidates the trajectory of chicken domestication from Asia to Japan.
+In this repository you find codes used in Matsuda *et al.* (2025)
+[Population genomics elucidates the trajectory of chicken domestication from Asia to Japan](https://doi.org/10.1016/j.psj.2025.105060).
 
 
 ## Requirements
@@ -33,6 +34,20 @@ In this repository you find codes used in Matsuda *et al.* (2025) Population gen
 - [myrrr](https://github.com/ymat2/myrrr)
 
 
+## Data Availability
+
+All the supplementary data of this study are available within the paper and its Supplementary Information files.
+The nucleotide sequences of the Japanese chicken breeds were deposited in the DDBJ Sequenced Read Archive under a Bioproject
+[PRJDB19943](https://www.ncbi.nlm.nih.gov/bioproject/PRJDB19943/).
+
+
 ## Publication
 
-*in press*
+Yuki Matsuda, Yuki Matsumoto, Yuki Higashiura, Andres Bendesky, Masaoki Tsudzuki, Tsuyoshi Shimmura,
+Population genomics elucidates the trajectory of chicken domestication from Asia to Japan,
+Poultry Science,
+Volume 104, Issue 5,
+2025,
+105060,
+ISSN 0032-5791,
+https://doi.org/10.1016/j.psj.2025.105060.
