@@ -13,11 +13,11 @@ prefix=popstr.mt
 [ ! -e ${workdir} ] && mkdir -p ${workdir}
 cd ${workdir}
 
-/usr/bin/python3 ~/bin/vcf2phylip/vcf2phylip.py -i ${vcf} --fasta
+/usr/bin/python3 ~/scripts/vcf2phylip/vcf2phylip.py -i ${vcf} --fasta
 /usr/bin/python3 ../../src/sort_mitochondria_seq.py -i ${prefix}.min4.fasta -o ${prefix}.min4.sort.fasta
 rm ${prefix}.min4.fasta ${prefix}.min4.phy
 
 rapidnj ${prefix}.min4.sort.fasta -i fa -o t -b 100 --evolution-model kim -x ${prefix}.nj.tree
 
-/usr/bin/python3 ~/bin/MitoToolPy/mitotoolpy-seq.py -s chicken -r whole -i ${prefix}.min4.sort.fasta -o stdout > ${prefix}.mitotool
-/usr/bin/python3 ~/bin/MitoToolPy/mitotoolpy-seq.py -s chicken -r dloop -i ${prefix}.min4.sort.fasta -o stdout > ${prefix}.D.mitotool
+/usr/bin/python3 ~/scripts/MitoToolPy/mitotoolpy-seq.py -s chicken -r whole -i ${prefix}.min4.sort.fasta -o stdout > ${prefix}.mitotool
+/usr/bin/python3 ~/scripts/MitoToolPy/mitotoolpy-seq.py -s chicken -r dloop -i ${prefix}.min4.sort.fasta -o stdout > ${prefix}.D.mitotool

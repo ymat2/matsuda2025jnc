@@ -22,7 +22,7 @@ plink2 --bfile ${prefix} \
   --export vcf id-paste=iid\
   --out ${subvcf}
 
-/usr/bin/python3 ~/bin/vcf2phylip/vcf2phylip.py -i ${subvcf}.vcf --resolve-IUPAC
+/usr/bin/python3 ~/scripts/vcf2phylip/vcf2phylip.py -i ${subvcf}.vcf --resolve-IUPAC
 rm ${subvcf}.vcf*
 
 poppy remove_invariant_site -i ${subvcf}.min4.phy -o ${subvcf}.varsites.fa --format fasta
