@@ -31,7 +31,7 @@ In this repository you find codes used in Matsuda *et al.* (2025)
 - phytools
 - ggtree
 - OptM
-- [myrrr](https://github.com/ymat2/myrrr)
+- [myrrr v0.0.0.9000](https://github.com/ymat2/myrrr/releases/tag/v0.0.0.9000)
 
 
 ## Data Availability
